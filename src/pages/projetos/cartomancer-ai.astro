@@ -1,0 +1,234 @@
+---
+---
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cartomancer AI — Manuel Bahamonde</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
+  }
+  :root{
+    --bg:#040806; --bg-alt:#081210; --ink:#dffef0; --ink-dim:#5f9a8f;
+    --accent:#22ff6e; --accent-2:#00e5ff; --on-accent:#04140a;
+    --border:rgba(0,229,255,0.16); --border-strong:rgba(34,255,110,0.45);
+    --track-bg:rgba(0,229,255,0.08);
+    --radius-sm:2px; --radius-xs:1px; --radius-md:2px;
+    --font:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);min-height:100vh;position:relative;}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(34,255,110,0.02) 0px,rgba(34,255,110,0.02) 1px,transparent 1px,transparent 3px);
+  }
+  body::after{content:"";position:fixed;inset:16px;z-index:0;pointer-events:none;border:1px solid rgba(0,229,255,0.15);}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--accent-2);outline-offset:2px;}
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;}
+
+  nav.site{display:flex;align-items:center;justify-content:space-between;padding:22px clamp(20px,5vw,48px);}
+  .back-link{display:inline-flex;align-items:center;gap:8px;color:var(--ink-dim);text-decoration:none;font-size:13px;}
+  .back-link:hover{color:var(--accent-2);}
+  .back-link svg{width:15px;height:15px;}
+  .brand{font-weight:800;font-size:14px;color:var(--ink-dim);}
+
+  .hero{padding:24px clamp(20px,5vw,48px) 48px;}
+  .hero-eyebrow{display:block;font-size:12px;letter-spacing:0.1em;color:var(--accent);margin-bottom:16px;text-transform:uppercase;}
+  .hero h1{font-weight:800;font-size:clamp(34px,6vw,56px);line-height:1;text-wrap:balance;}
+  .hero-tagline{margin-top:16px;max-width:60ch;color:var(--ink-dim);font-size:15px;line-height:1.7;}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+  .badge{font-size:11px;padding:6px 11px;border:1px solid var(--border);border-radius:999px;color:var(--ink-dim);}
+  .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
+  .btn-github{
+    display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:var(--radius-sm);
+    border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:700;font-size:13.5px;
+    transition:background 150ms,color 150ms,transform 150ms;
+  }
+  .btn-github svg{width:16px;height:16px;}
+  .btn-github:hover{background:var(--accent);color:var(--on-accent);transform:translateY(-1px);}
+
+  section{padding:44px clamp(20px,5vw,48px);border-top:1px solid var(--border);}
+  .pattern-bg{
+    background-image:
+      radial-gradient(rgba(0,229,255,0.14) 1px,transparent 1.5px),
+      linear-gradient(rgba(0,229,255,0.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,229,255,0.045) 1px,transparent 1px);
+    background-size:44px 44px,44px 44px,44px 44px;
+    background-position:-1px -1px;
+  }
+  .section-title{font-weight:800;font-size:clamp(19px,2.6vw,26px);text-transform:uppercase;margin-bottom:22px;}
+  .lead{color:var(--ink-dim);font-size:14.5px;line-height:1.8;max-width:68ch;}
+  .lead + .lead{margin-top:14px;}
+
+  .step-list{display:flex;flex-direction:column;gap:0;border-left:1px solid var(--border);padding-left:26px;margin-top:26px;}
+  .step{position:relative;padding-bottom:26px;}
+  .step:last-child{padding-bottom:0;}
+  .step::before{content:"";position:absolute;left:-31px;top:3px;width:9px;height:9px;border-radius:50%;background:var(--accent-2);border:2px solid var(--bg);}
+  .step-title{font-weight:800;font-size:14.5px;}
+  .step-desc{margin-top:5px;color:var(--ink-dim);font-size:13px;line-height:1.65;max-width:62ch;}
+
+  .stack-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px;margin-top:8px;}
+  .stack-group-title{font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent-2);margin-bottom:10px;}
+  .stack-tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .stack-tags span{font-size:11px;color:var(--ink-dim);border:1px solid var(--border);padding:4px 9px;border-radius:var(--radius-xs);}
+
+  .cmd-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px;}
+  .cmd-table th{text-align:left;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-dim);padding:0 14px 10px 0;border-bottom:1px solid var(--border);}
+  .cmd-table td{padding:11px 14px 11px 0;border-bottom:1px solid var(--border);vertical-align:top;}
+  .cmd-table tr:last-child td{border-bottom:none;}
+  .cmd{color:var(--accent);white-space:nowrap;}
+  .cmd-desc{color:var(--ink-dim);}
+  .table-scroll{overflow-x:auto;}
+
+  .learning-list{display:flex;flex-direction:column;gap:16px;margin-top:8px;}
+  .learning{
+    border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-alt);
+    padding:18px 20px;
+  }
+  .learning-title{font-weight:700;font-size:13.5px;color:var(--accent-2);margin-bottom:6px;}
+  .learning-desc{color:var(--ink-dim);font-size:13px;line-height:1.7;}
+
+  footer.site{padding:40px clamp(20px,5vw,48px) 56px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;}
+  .footer-line{color:var(--ink-dim);font-size:11.5px;}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <nav class="site">
+    <a class="back-link" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12,19 5,12 12,5"></polyline></svg>
+      Voltar ao portfólio
+    </a>
+    <div class="brand">Manuel Bahamonde</div>
+  </nav>
+
+  <header class="hero">
+    <span class="hero-eyebrow">Projeto Pessoal &middot; Python + Docker</span>
+    <h1>Cartomancer AI</h1>
+    <p class="hero-tagline">Fila local-first para gerar mapas de batalha de RPG em lote, usando IA (Flux.1 dev GGUF via ComfyUI). Feito para quem tem paciência, mas não tem VRAM de sobra: roda em uma única GPU de 8GB, com offload para RAM.</p>
+    <div class="badge-row">
+      <span class="badge">Python 3.11+</span>
+      <span class="badge">Docker Compose</span>
+      <span class="badge">SQLite</span>
+      <span class="badge">ComfyUI</span>
+      <span class="badge">Typer + Pydantic</span>
+      <span class="badge">MIT License</span>
+    </div>
+    <div class="hero-ctas">
+      <a class="btn-github" href="https://github.com/NoClick11/CartomancerAI" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,7 3,12 8,17"></polyline><polyline points="16,7 21,12 16,17"></polyline></svg>
+        Ver no GitHub
+      </a>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-title">Visão Geral</div>
+    <p class="lead">Cartomancer AI enfileira descrições de mapas escritas em YAML (ou texto simples) e processa uma de cada vez, gerando as imagens localmente através de uma instância própria do ComfyUI rodando Flux.1 dev quantizado em GGUF.</p>
+    <p class="lead">A ideia é simples: escrever um lote de mapas antes de dormir, deixar a fila rodando a noite toda (cada imagem leva de 10 a 20 minutos numa GPU de 8GB) e acordar com uma pasta cheia de mapas prontos — sem depender de serviços pagos de geração de imagem.</p>
+  </section>
+
+  <section class="pattern-bg">
+    <div class="section-title">Como Funciona</div>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-title">1. Escrever os mapas</div>
+        <div class="step-desc">Descrições de mapas em YAML (nome, tags e prompt por item) ou um arquivo de texto simples, um prompt por linha.</div>
+      </div>
+      <div class="step">
+        <div class="step-title">2. Enfileirar</div>
+        <div class="step-desc"><code>cartomancer enqueue prompts.yaml</code> processa o arquivo e insere os jobs numa fila local em SQLite.</div>
+      </div>
+      <div class="step">
+        <div class="step-title">3. Processar</div>
+        <div class="step-desc">O worker roda em loop, pega um job pendente por vez, monta o grafo de workflow do ComfyUI para Flux.1 dev GGUF, envia via API HTTP/WebSocket e salva a imagem resultante.</div>
+      </div>
+      <div class="step">
+        <div class="step-title">4. Acompanhar</div>
+        <div class="step-desc"><code>cartomancer status</code> e <code>cartomancer show &lt;id&gt;</code> mostram o progresso da fila e o detalhe de cada job.</div>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:26px;">Tudo roda em containers Docker independentes: o serviço <code>cartomancer</code> (fila + worker) e o serviço <code>comfyui</code> (geração de imagem), conectados por uma rede dedicada. O ComfyUI é tratado como um serviço externo — de propósito — em vez de embutido no projeto: ele evolui rápido e exige um node customizado (<code>ComfyUI-GGUF</code>) e arquivos de modelo específicos, então acoplar tudo tornaria o projeto frágil a cada atualização. É o mesmo padrão de um cliente de CLI conversando com um servidor Ollama.</p>
+  </section>
+
+  <section>
+    <div class="section-title">Stack Técnica</div>
+    <div class="stack-groups">
+      <div>
+        <div class="stack-group-title">CLI &amp; Config</div>
+        <div class="stack-tags"><span>Typer</span><span>Rich</span><span>Pydantic v2</span><span>pydantic-settings</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Dados &amp; Rede</div>
+        <div class="stack-tags"><span>PyYAML</span><span>SQLite</span><span>requests</span><span>websocket-client</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Empacotamento</div>
+        <div class="stack-tags"><span>Hatchling</span><span>uv</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Qualidade</div>
+        <div class="stack-tags"><span>pytest</span><span>pytest-mock</span><span>ruff</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Infraestrutura</div>
+        <div class="stack-tags"><span>Docker Compose</span><span>NVIDIA Container Toolkit</span><span>ComfyUI-GGUF</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pattern-bg">
+    <div class="section-title">Referência de Comandos</div>
+    <div class="table-scroll">
+      <table class="cmd-table">
+        <thead><tr><th>Comando</th><th>O que faz</th></tr></thead>
+        <tbody>
+          <tr><td class="cmd">cartomancer init</td><td class="cmd-desc">Cria a estrutura inicial (prompts/, data/, .env) no diretório atual</td></tr>
+          <tr><td class="cmd">cartomancer enqueue &lt;arquivo&gt;</td><td class="cmd-desc">Lê um arquivo .yaml/.txt e enfileira os jobs</td></tr>
+          <tr><td class="cmd">cartomancer worker start</td><td class="cmd-desc">Roda o loop do worker (comando padrão do container)</td></tr>
+          <tr><td class="cmd">cartomancer worker recover</td><td class="cmd-desc">Devolve jobs travados em "running" para "pending" após uma queda</td></tr>
+          <tr><td class="cmd">cartomancer status</td><td class="cmd-desc">Lista os jobs da fila e seus status</td></tr>
+          <tr><td class="cmd">cartomancer show &lt;id&gt;</td><td class="cmd-desc">Mostra o detalhe completo de um job</td></tr>
+          <tr><td class="cmd">cartomancer retry &lt;id&gt;</td><td class="cmd-desc">Reenfileira um job que falhou</td></tr>
+          <tr><td class="cmd">cartomancer doctor</td><td class="cmd-desc">Diagnostica conectividade, GPU, node customizado e arquivos de modelo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Decisões &amp; Aprendizados</div>
+    <div class="learning-list">
+      <div class="learning">
+        <div class="learning-title">Modelos não são baixados automaticamente</div>
+        <div class="learning-desc">Os pesos do Flux.1 dev GGUF são baixados manualmente pelo usuário. São arquivos de vários gigabytes com licença própria (não-comercial, da Black Forest Labs) — automatizar o download tiraria essa decisão de licenciamento das mãos do usuário e tornaria a instalação frágil.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Containers rodam sem privilégio de root</div>
+        <div class="learning-desc">Os serviços rodam com o UID/GID do usuário do host (padrão 1000:1000), para que o banco SQLite e as imagens geradas em ./data pertençam ao usuário real, não a root.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Prompt engineering tem limite</div>
+        <div class="learning-desc">Em testes reais (ago/2026), o Flux.1 dev base tende a renderizar ilustrações cinematográficas em vez do estilo plano e ortográfico esperado de um mapa de batalha, mesmo com prompts ajustados. Uma LoRA treinada em mapas reais é o próximo passo identificado para resolver isso de fato.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Fora do escopo da v1 (roadmap)</div>
+        <div class="learning-desc">Interface web com galeria e busca, upscaling (Ultimate SD Upscale), ControlNet para guiar composição, geração em lote com variações/seeds, suporte validado a ROCm/AMD e notificações de conclusão.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site">
+    <div class="footer-line">Cartomancer AI &middot; MIT License</div>
+    <a class="btn-github" href="https://github.com/NoClick11/CartomancerAI" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,7 3,12 8,17"></polyline><polyline points="16,7 21,12 16,17"></polyline></svg>
+      Ver no GitHub
+    </a>
+  </footer>
+</div>
+</body>
+</html>

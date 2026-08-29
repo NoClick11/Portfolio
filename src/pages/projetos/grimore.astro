@@ -1,0 +1,225 @@
+---
+---
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Grimore — Manuel Bahamonde</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
+  }
+  :root{
+    --bg:#040806; --bg-alt:#081210; --ink:#dffef0; --ink-dim:#5f9a8f;
+    --accent:#22ff6e; --accent-2:#00e5ff; --on-accent:#04140a;
+    --border:rgba(0,229,255,0.16); --border-strong:rgba(34,255,110,0.45);
+    --track-bg:rgba(0,229,255,0.08);
+    --radius-sm:2px; --radius-xs:1px; --radius-md:2px;
+    --font:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);min-height:100vh;position:relative;}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(34,255,110,0.02) 0px,rgba(34,255,110,0.02) 1px,transparent 1px,transparent 3px);
+  }
+  body::after{content:"";position:fixed;inset:16px;z-index:0;pointer-events:none;border:1px solid rgba(0,229,255,0.15);}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--accent-2);outline-offset:2px;}
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;}
+
+  nav.site{display:flex;align-items:center;justify-content:space-between;padding:22px clamp(20px,5vw,48px);}
+  .back-link{display:inline-flex;align-items:center;gap:8px;color:var(--ink-dim);text-decoration:none;font-size:13px;}
+  .back-link:hover{color:var(--accent-2);}
+  .back-link svg{width:15px;height:15px;}
+  .brand{font-weight:800;font-size:14px;color:var(--ink-dim);}
+
+  .hero{padding:24px clamp(20px,5vw,48px) 48px;}
+  .hero-eyebrow{display:block;font-size:12px;letter-spacing:0.1em;color:var(--accent);margin-bottom:16px;text-transform:uppercase;}
+  .hero h1{font-weight:800;font-size:clamp(34px,6vw,56px);line-height:1;text-wrap:balance;}
+  .hero-tagline{margin-top:16px;max-width:60ch;color:var(--ink-dim);font-size:15px;line-height:1.7;}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+  .badge{font-size:11px;padding:6px 11px;border:1px solid var(--border);border-radius:999px;color:var(--ink-dim);}
+  .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
+  .btn-github{
+    display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:var(--radius-sm);
+    border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:700;font-size:13.5px;
+    transition:background 150ms,color 150ms,transform 150ms;
+  }
+  .btn-github svg{width:16px;height:16px;}
+  .btn-github:hover{background:var(--accent);color:var(--on-accent);transform:translateY(-1px);}
+
+  section{padding:44px clamp(20px,5vw,48px);border-top:1px solid var(--border);}
+  .pattern-bg{
+    background-image:
+      radial-gradient(rgba(0,229,255,0.14) 1px,transparent 1.5px),
+      linear-gradient(rgba(0,229,255,0.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,229,255,0.045) 1px,transparent 1px);
+    background-size:44px 44px,44px 44px,44px 44px;
+    background-position:-1px -1px;
+  }
+  .section-title{font-weight:800;font-size:clamp(19px,2.6vw,26px);text-transform:uppercase;margin-bottom:22px;}
+  .lead{color:var(--ink-dim);font-size:14.5px;line-height:1.8;max-width:68ch;}
+  .lead + .lead{margin-top:14px;}
+
+  /* entity model */
+  .entity-hierarchy{display:flex;flex-direction:column;gap:8px;margin:26px 0 30px;font-size:13px;}
+  .entity-row{display:flex;align-items:center;gap:10px;color:var(--ink-dim);}
+  .entity-row b{color:var(--ink);font-weight:700;}
+  .entity-arrow{color:var(--accent-2);}
+  .entity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+  .entity-card{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-alt);padding:16px 18px;}
+  .entity-name{font-weight:800;font-size:13.5px;color:var(--accent-2);}
+  .entity-desc{margin-top:6px;color:var(--ink-dim);font-size:12px;line-height:1.6;}
+
+  .feature-list{display:flex;flex-direction:column;gap:0;border-left:1px solid var(--border);padding-left:26px;margin-top:8px;}
+  .feature{position:relative;padding-bottom:24px;}
+  .feature:last-child{padding-bottom:0;}
+  .feature::before{content:"";position:absolute;left:-31px;top:3px;width:9px;height:9px;border-radius:50%;background:var(--accent-2);border:2px solid var(--bg);}
+  .feature-title{font-weight:800;font-size:14.5px;}
+  .feature-desc{margin-top:5px;color:var(--ink-dim);font-size:13px;line-height:1.65;max-width:62ch;}
+
+  .stack-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px;margin-top:8px;}
+  .stack-group-title{font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent-2);margin-bottom:10px;}
+  .stack-tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .stack-tags span{font-size:11px;color:var(--ink-dim);border:1px solid var(--border);padding:4px 9px;border-radius:var(--radius-xs);}
+
+  .learning-list{display:flex;flex-direction:column;gap:16px;margin-top:8px;}
+  .learning{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-alt);padding:18px 20px;}
+  .learning-title{font-weight:700;font-size:13.5px;color:var(--accent-2);margin-bottom:6px;}
+  .learning-desc{color:var(--ink-dim);font-size:13px;line-height:1.7;}
+
+  footer.site{padding:40px clamp(20px,5vw,48px) 56px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;}
+  .footer-line{color:var(--ink-dim);font-size:11.5px;}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <nav class="site">
+    <a class="back-link" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12,19 5,12 12,5"></polyline></svg>
+      Voltar ao portfólio
+    </a>
+    <div class="brand">Manuel Bahamonde</div>
+  </nav>
+
+  <header class="hero">
+    <span class="hero-eyebrow">Projeto Pessoal &middot; Laravel + Vue</span>
+    <h1>Grimore</h1>
+    <p class="hero-tagline">Ferramenta de gestão de campanhas de RPG de mesa para mestres: uma wiki de campanha, um mapa interativo e um diário de sessões, tudo em um só lugar. Focado inteiramente no mestre — sem contas de jogador, dados ou fichas de personagem.</p>
+    <div class="badge-row">
+      <span class="badge">Laravel 13</span>
+      <span class="badge">Inertia.js v2</span>
+      <span class="badge">Vue 3</span>
+      <span class="badge">Tailwind CSS</span>
+      <span class="badge">Konva</span>
+      <span class="badge">Tiptap</span>
+    </div>
+    <div class="hero-ctas">
+      <a class="btn-github" href="https://github.com/NoClick11/Grimore" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,7 3,12 8,17"></polyline><polyline points="16,7 21,12 16,17"></polyline></svg>
+        Ver no GitHub
+      </a>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-title">Visão Geral</div>
+    <p class="lead">Grimore nasceu da necessidade de organizar campanhas de RPG de mesa que crescem rápido demais para caber em um caderno: NPCs, locais, itens, objetivos e a história em si. É uma ferramenta pensada exclusivamente para o mestre da mesa, que centraliza esse conteúdo em um "banco de dados" da campanha, um mapa visual interativo e um registro de sessões.</p>
+    <p class="lead">Cada campanha é isolada por usuário — sem contas de jogador, sistema de dados ou fichas de personagem. O foco é 100% em worldbuilding e continuidade narrativa entre sessões.</p>
+  </section>
+
+  <section class="pattern-bg">
+    <div class="section-title">Modelo de Dados</div>
+    <div class="entity-hierarchy">
+      <div class="entity-row"><b>Usuário</b><span class="entity-arrow">&rarr;</span><b>Campanha</b><span class="entity-arrow">&rarr;</span>Arcos, NPCs, Itens, Locais, Cenários, Objetivos, Mapa, Notas de Sessão</div>
+    </div>
+    <div class="entity-grid">
+      <div class="entity-card"><div class="entity-name">Campanha</div><div class="entity-desc">Sistema de jogo, status, arco atual e componente de mapa em foco</div></div>
+      <div class="entity-card"><div class="entity-name">Arco</div><div class="entity-desc">Capítulos da história, ordenados, ligados a NPCs/itens/locais via uma tabela pivot polimórfica</div></div>
+      <div class="entity-card"><div class="entity-name">Mapa (Konva)</div><div class="entity-desc">Componentes posicionáveis (x/y/rotação/escala) e rotas entre eles</div></div>
+      <div class="entity-card"><div class="entity-name">NPC / Item / Local / Cenário</div><div class="entity-desc">Entidades da campanha, com lore em texto rico e recompensas vinculáveis entre si</div></div>
+      <div class="entity-card"><div class="entity-name">Objetivo</div><div class="entity-desc">Missões e metas da campanha, com recompensa associada</div></div>
+      <div class="entity-card"><div class="entity-name">Nota de Sessão</div><div class="entity-desc">Registro numerado e datado de cada sessão jogada</div></div>
+    </div>
+    <p class="lead" style="margin-top:24px;">O relacionamento entre entidades é resolvido por três tabelas polimórficas: uma liga qualquer entidade a um Arco (o que está envolvido em cada capítulo da história), outra trata itens como recompensa de NPCs, objetivos, locais ou cenários, e uma terceira associa NPCs a locais e cenários onde aparecem — permitindo montar a teia de relações da campanha sem duplicar tabelas para cada combinação possível.</p>
+  </section>
+
+  <section>
+    <div class="section-title">Funcionalidades</div>
+    <div class="feature-list">
+      <div class="feature">
+        <div class="feature-title">Gestão de campanhas</div>
+        <div class="feature-desc">Criação de campanhas e seleção da campanha ativa, mantida na sessão do usuário.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Mapa interativo</div>
+        <div class="feature-desc">Renderizado com Konva: posicionamento de componentes no mapa, rotas conectando pontos e um modal de detalhe por componente.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Banco de dados da campanha</div>
+        <div class="feature-desc">CRUD de NPCs, itens, locais, cenários e objetivos, com editor de texto rico (Tiptap) para a lore de cada um.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Arcos da história</div>
+        <div class="feature-desc">Organização da narrativa em arcos ordenados, com tracking de qual arco e qual ponto do mapa estão "em foco" no momento.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Notas de sessão &amp; galeria de mídia</div>
+        <div class="feature-desc">Diário de sessões numeradas e datadas, além de uma galeria de mídia por campanha.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pattern-bg">
+    <div class="section-title">Stack Técnica</div>
+    <div class="stack-groups">
+      <div>
+        <div class="stack-group-title">Backend</div>
+        <div class="stack-tags"><span>Laravel 13</span><span>PHP 8.3</span><span>Breeze (auth)</span><span>Sanctum</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Frontend</div>
+        <div class="stack-tags"><span>Inertia.js v2</span><span>Vue 3</span><span>Tailwind CSS</span><span>Vite</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Bibliotecas</div>
+        <div class="stack-tags"><span>Tiptap</span><span>Konva / vue-konva</span><span>lucide-vue-next</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Dados</div>
+        <div class="stack-tags"><span>SQLite</span><span>Eloquent</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Decisões &amp; Estado Atual</div>
+    <div class="learning-list">
+      <div class="learning">
+        <div class="learning-title">Relação genérica entre entidades</div>
+        <div class="learning-desc">Em vez de criar uma rota específica para cada combinação de entidade, o backend expõe um endpoint genérico de vínculo (<code>/api/rpg/attach</code>) que resolve o modelo e a relação dinamicamente — a mesma lógica atende NPCs, itens, locais, cenários e componentes do mapa.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Em desenvolvimento ativo</div>
+        <div class="learning-desc">O projeto está em evolução constante; algumas partes, como o endpoint de desvincular entidades de um arco, ainda estão sendo implementadas.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Escopo intencional</div>
+        <div class="learning-desc">Sem contas de jogador, sistema de dados ou fichas de personagem por design — a ferramenta resolve o problema do mestre (organização e continuidade), não o da mesa inteira.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site">
+    <div class="footer-line">Grimore &middot; Projeto pessoal</div>
+    <a class="btn-github" href="https://github.com/NoClick11/Grimore" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,7 3,12 8,17"></polyline><polyline points="16,7 21,12 16,17"></polyline></svg>
+      Ver no GitHub
+    </a>
+  </footer>
+</div>
+</body>
+</html>
