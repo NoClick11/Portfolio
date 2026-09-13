@@ -1,0 +1,267 @@
+---
+---
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="alternate icon" href="/favicon.ico" />
+<title>Click NFS-e — Manuel Bahamonde</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
+  }
+  :root{
+    --bg:#040806; --bg-alt:#081210; --ink:#dffef0; --ink-dim:#5f9a8f;
+    --accent:#22ff6e; --accent-2:#00e5ff; --on-accent:#04140a;
+    --border:rgba(0,229,255,0.16); --border-strong:rgba(34,255,110,0.45);
+    --track-bg:rgba(0,229,255,0.08);
+    --radius-sm:2px; --radius-xs:1px; --radius-md:2px;
+    --font:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);min-height:100vh;position:relative;}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(34,255,110,0.02) 0px,rgba(34,255,110,0.02) 1px,transparent 1px,transparent 3px);
+  }
+  body::after{content:"";position:fixed;inset:16px;z-index:0;pointer-events:none;border:1px solid rgba(0,229,255,0.15);}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--accent-2);outline-offset:2px;}
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;}
+
+  nav.site{display:flex;align-items:center;justify-content:space-between;padding:22px clamp(20px,5vw,48px);}
+  .back-link{display:inline-flex;align-items:center;gap:8px;color:var(--ink-dim);text-decoration:none;font-size:13px;}
+  .back-link:hover{color:var(--accent-2);}
+  .back-link svg{width:15px;height:15px;}
+  .brand{font-weight:800;font-size:14px;color:var(--ink-dim);}
+
+  .hero{padding:24px clamp(20px,5vw,48px) 48px;}
+  .hero-eyebrow{display:block;font-size:12px;letter-spacing:0.1em;color:var(--accent);margin-bottom:16px;text-transform:uppercase;}
+  .hero h1{font-weight:800;font-size:clamp(34px,6vw,56px);line-height:1;text-wrap:balance;}
+  .hero-tagline{margin-top:16px;max-width:60ch;color:var(--ink-dim);font-size:15px;line-height:1.7;}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+  .badge{font-size:11px;padding:6px 11px;border:1px solid var(--border);border-radius:999px;color:var(--ink-dim);}
+  .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
+  .btn-github{
+    display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:var(--radius-sm);
+    border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:700;font-size:13.5px;
+    transition:background 150ms,color 150ms,transform 150ms;
+  }
+  .btn-github svg{width:16px;height:16px;}
+  .btn-github:hover{background:var(--accent);color:var(--on-accent);transform:translateY(-1px);}
+
+  section{padding:44px clamp(20px,5vw,48px);border-top:1px solid var(--border);}
+  .pattern-bg{
+    background-image:
+      radial-gradient(rgba(0,229,255,0.14) 1px,transparent 1.5px),
+      linear-gradient(rgba(0,229,255,0.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,229,255,0.045) 1px,transparent 1px);
+    background-size:44px 44px,44px 44px,44px 44px;
+    background-position:-1px -1px;
+  }
+  .section-title{font-weight:800;font-size:clamp(19px,2.6vw,26px);text-transform:uppercase;margin-bottom:22px;}
+  .lead{color:var(--ink-dim);font-size:14.5px;line-height:1.8;max-width:68ch;}
+  .lead + .lead{margin-top:14px;}
+
+  /* entity model */
+  .entity-hierarchy{display:flex;flex-direction:column;gap:8px;margin:26px 0 30px;font-size:13px;}
+  .entity-row{display:flex;align-items:center;gap:10px;color:var(--ink-dim);}
+  .entity-row b{color:var(--ink);font-weight:700;}
+  .entity-arrow{color:var(--accent-2);}
+  .entity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+  .entity-card{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-alt);padding:16px 18px;}
+  .entity-name{font-weight:800;font-size:13.5px;color:var(--accent-2);}
+  .entity-desc{margin-top:6px;color:var(--ink-dim);font-size:12px;line-height:1.6;}
+
+  .feature-list{display:flex;flex-direction:column;gap:0;border-left:1px solid var(--border);padding-left:26px;margin-top:8px;}
+  .feature{position:relative;padding-bottom:24px;}
+  .feature:last-child{padding-bottom:0;}
+  .feature::before{content:"";position:absolute;left:-31px;top:3px;width:9px;height:9px;border-radius:50%;background:var(--accent-2);border:2px solid var(--bg);}
+  .feature-title{font-weight:800;font-size:14.5px;}
+  .feature-desc{margin-top:5px;color:var(--ink-dim);font-size:13px;line-height:1.65;max-width:62ch;}
+
+  .stack-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px;margin-top:8px;}
+  .stack-group-title{font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent-2);margin-bottom:10px;}
+  .stack-tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .stack-tags span{font-size:11px;color:var(--ink-dim);border:1px solid var(--border);padding:4px 9px;border-radius:var(--radius-xs);}
+
+  .learning-list{display:flex;flex-direction:column;gap:16px;margin-top:8px;}
+  .learning{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-alt);padding:18px 20px;}
+  .learning-title{font-weight:700;font-size:13.5px;color:var(--accent-2);margin-bottom:6px;}
+  .learning-desc{color:var(--ink-dim);font-size:13px;line-height:1.7;}
+
+  footer.site{padding:40px clamp(20px,5vw,48px) 56px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;}
+  .footer-line{color:var(--ink-dim);font-size:11.5px;}
+  code{font-family:inherit;color:var(--accent-2);font-size:0.95em;}
+  .flow{display:flex;flex-direction:column;gap:6px;margin:26px 0 8px;font-size:13px;}
+  .flow-step{display:flex;align-items:flex-start;gap:12px;color:var(--ink-dim);line-height:1.6;}
+  .flow-step b{color:var(--ink);font-weight:700;white-space:nowrap;}
+  .flow-step .n{color:var(--accent);font-weight:800;min-width:24px;}
+  .rej-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;}
+  .rej-table th,.rej-table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;}
+  .rej-table th{color:var(--accent-2);font-size:11px;letter-spacing:0.07em;text-transform:uppercase;font-weight:700;}
+  .rej-table td:first-child{color:var(--accent);white-space:nowrap;font-weight:700;}
+  .rej-table td{color:var(--ink-dim);}
+  .table-wrap{overflow-x:auto;}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <nav class="site">
+    <a class="back-link" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12,19 5,12 12,5"></polyline></svg>
+      Voltar ao portfólio
+    </a>
+    <div class="brand">Manuel Bahamonde</div>
+  </nav>
+
+  <header class="hero">
+    <span class="hero-eyebrow">Biblioteca Open Source &middot; PHP / Laravel</span>
+    <h1>Click NFS-e</h1>
+    <p class="hero-tagline">Emissão de NFS-e no padrão nacional para Laravel. DPS assinada em XMLDSIG, envio com mTLS à Sefin Nacional, cancelamento com escalonamento para análise fiscal e dados do DANFSe — com o conhecimento fiscal extraído de um sistema em produção.</p>
+    <div class="badge-row">
+      <span class="badge">PHP 8.2+</span>
+      <span class="badge">Laravel 12 | 13</span>
+      <span class="badge">DPS v1.01</span>
+      <span class="badge">XMLDSIG</span>
+      <span class="badge">mTLS</span>
+      <span class="badge">MIT</span>
+    </div>
+    <div class="hero-ctas">
+      <a class="btn-github" href="https://github.com/NoClick11/click-nfse" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,7 3,12 8,17"></polyline><polyline points="16,7 21,12 16,17"></polyline></svg>
+        Ver no GitHub
+      </a>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-title">Visão Geral</div>
+    <p class="lead">Desde 1º/09/2026 a Resolução CGSN nº 189/2026 obriga ME e EPP do Simples Nacional a emitir NFS-e pelo Emissor Nacional. Integrar-se a ele é menos sobre HTTP e mais sobre detalhe fiscal: a DPS precisa sair na ordem exata do <code>xs:sequence</code>, assinada com parâmetros que não se negociam, com campos obrigatórios num regime tributário e proibidos em outro — e cada erro só aparece depois do envio, com o número da DPS já queimado.</p>
+    <p class="lead">A Click NFS-e empacota esse conhecimento. O núcleo veio de um sistema em produção e foi extraído com as regras que ele aprendeu na prática, cada uma comentada com o código de rejeição que a motivou. Distribuída via Composer como <code>noclick11/click-nfse</code>.</p>
+  </section>
+
+  <section class="pattern-bg">
+    <div class="section-title">Como Funciona</div>
+    <p class="lead">O ponto central: <b style="color:var(--ink)">o número da DPS é reservado e a nota é persistida antes de qualquer chamada HTTP.</b> A regra E0014 proíbe reutilizar um número, mas a legislação admite lacunas na sequência — então, se o envio falhar, a retentativa reaproveita o mesmo número em vez de queimar outro. Gerar número novo a cada tentativa arriscaria emitir duas notas para a mesma cobrança quando a Sefin processou o documento e apenas a resposta se perdeu.</p>
+    <div class="flow">
+      <div class="flow-step"><span class="n">01</span><span><b>Elegibilidade</b> — o faturável é avaliado; se não pode gerar nota, vira registro <code>INAPTA</code> com o motivo, sem consumir número.</span></div>
+      <div class="flow-step"><span class="n">02</span><span><b>Reserva do nDPS</b> — número reservado por ambiente e série em transação, e a nota persistida.</span></div>
+      <div class="flow-step"><span class="n">03</span><span><b>Montagem e assinatura</b> — DPS construída com <code>DOMDocument</code> na ordem do schema e assinada em XMLDSIG.</span></div>
+      <div class="flow-step"><span class="n">04</span><span><b>Envio à Sefin</b> — POST com mTLS, corpo JSON em GZip + base64.</span></div>
+      <div class="flow-step"><span class="n">05</span><span><b>Desfecho</b> — <code>AUTORIZADA</code> (chave + XML guardados), <code>REJEITADA</code> (erros gravados) ou <code>ERRO</code> (retry com backoff e reconciliação antes de reenviar).</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Recursos</div>
+    <div class="feature-list">
+      <div class="feature">
+        <div class="feature-title">DPS no leiaute v1.01 + assinatura XMLDSIG</div>
+        <div class="feature-desc">Montada com <code>DOMDocument</code>, na ordem do <code>xs:sequence</code>. Assinatura com C14N inclusiva, RSA-SHA1 e <code>EndCertOnly</code> — os parâmetros do Manual Integrado. O XML assinado nunca é reserializado.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Transporte mTLS</div>
+        <div class="feature-desc">Certificado A1 (e-CNPJ) convertido para PEM sob demanda, com permissões <code>0600</code> em diretório <code>0700</code>. Diagnóstico de validade, titular e EKU de autenticação cliente, com alerta de expiração.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Numeração transacional e reconciliação</div>
+        <div class="feature-desc"><code>nDPS</code> reservado por ambiente e série, com avanço automático quando a Sefin já consumiu o número. Antes de reenviar, consulta a Sefin pelo id da DPS — nunca emite o mesmo documento duas vezes.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Cancelamento com escalonamento</div>
+        <div class="feature-desc">Evento 101101 e, se o prazo municipal expirou, solicitação de análise fiscal (101103) com acompanhamento do deferimento ou indeferimento por até 30 dias.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Jobs, filas e comandos agendados</div>
+        <div class="feature-desc"><code>EmitirNfseJob</code> e <code>CancelarNfseJob</code> são <code>ShouldBeUnique</code>, com backoff exponencial de 1 min a 3 h. Comandos <code>nfse:verificar-certificado</code>, <code>nfse:reconciliar</code> e <code>nfse:acompanhar-analises</code> para o scheduler.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Dados do DANFSe</div>
+        <div class="feature-desc">XML autorizado achatado e formatado para impressão, sem impor motor de PDF ou gerador de QR Code. O documento com valor legal é o XML: o PDF é só representação.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Desacoplado do domínio da aplicação</div>
+        <div class="feature-desc">Dois contratos (<code>Faturavel</code> e <code>Tomador</code>) e uma relação polimórfica: a lib não conhece as tabelas do projeto que a usa.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pattern-bg">
+    <div class="section-title">Rejeições Cobertas</div>
+    <p class="lead" style="margin-bottom:18px;">A parte que custa caro descobrir sozinho: cada regra da lib existe por causa de um código de rejeição observado em produção.</p>
+    <div class="table-wrap">
+      <table class="rej-table">
+        <thead><tr><th>Código</th><th>O que significa</th><th>Como é tratado</th></tr></thead>
+        <tbody>
+          <tr><td>E0004 / E1263</td><td>Identificador não confere com o corpo</td><td><code>DpsIdGenerator</code> monta e valida contra o pattern do schema</td></tr>
+          <tr><td>E0008</td><td><code>dhEmi</code> no mesmo segundo do processamento</td><td>Recuo configurável (<code>NFSE_MARGEM_DH_EMI</code>)</td></tr>
+          <tr><td>E0014</td><td>Série + número já utilizados</td><td>Reserva o número seguinte e reenvia, até 25 avanços — reconciliando antes</td></tr>
+          <tr><td>E0120</td><td>IM do prestador não deve ser informada</td><td>IM só entra na DPS se habilitada por configuração</td></tr>
+          <tr><td>E0166</td><td>Falta <code>regApTribSN</code> no ME/EPP</td><td>Enviado quando <code>op_simp_nac = 3</code>, omitido nos demais</td></tr>
+          <tr><td>E0621 / E0625 / E0635</td><td>Alíquota obrigatória ou proibida</td><td><code>pAliq</code> só é enviada quando há retenção</td></tr>
+          <tr><td>E0712</td><td><code>indTotTrib</code> recusado no Simples</td><td>Optante declara <code>pTotTribSN</code>; os demais, <code>indTotTrib</code></td></tr>
+          <tr><td>E0714</td><td>Assinatura inválida</td><td>O XML assinado nunca é reserializado nem reindentado</td></tr>
+          <tr><td>E0824</td><td>Cancelamento sem tomador identificado</td><td>Emissão segurada (INAPTA) se o documento do tomador não valida</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Stack Técnica</div>
+    <div class="stack-groups">
+      <div>
+        <div class="stack-group-title">Runtime</div>
+        <div class="stack-tags"><span>PHP 8.2 – 8.4</span><span>Laravel 12 | 13</span><span>Composer / Packagist</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Fiscal &amp; Cripto</div>
+        <div class="stack-tags"><span>XMLDSIG (C14N, RSA-SHA1)</span><span>mTLS</span><span>ICP-Brasil A1</span><span>XSD oficial v1.00 / v1.01</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Extensões PHP</div>
+        <div class="stack-tags"><span>dom</span><span>libxml</span><span>openssl</span><span>simplexml</span><span>zlib</span></div>
+      </div>
+      <div>
+        <div class="stack-group-title">Qualidade</div>
+        <div class="stack-tags"><span>PHPUnit</span><span>Pint</span><span>GitHub Actions</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pattern-bg">
+    <div class="section-title">Decisões &amp; Estado Atual</div>
+    <div class="learning-list">
+      <div class="learning">
+        <div class="learning-title">Testes sem rede e sem certificado real</div>
+        <div class="learning-desc">A suíte valida DPS e eventos contra o pacote oficial de XSD versionado no repositório, e exercita a assinatura XMLDSIG com um par autoassinado gerado na hora do teste. Nenhum material de certificado é versionado. O CI cobre PHP 8.2, 8.3 e 8.4 contra Laravel 12 e 13.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Falhar visível, nunca em silêncio</div>
+        <div class="learning-desc">O que não pode ser emitido vira registro <code>INAPTA</code> com o motivo. Rejeições de regra de negócio (<code>NfseRejeicaoException</code>) e falhas técnicas (<code>NfseException</code>) são exceções distintas — a diferença é o que decide se vale reenviar.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Escalonamento conservador</div>
+        <div class="learning-desc">O pedido de análise fiscal só é aberto para códigos de rejeição configurados explicitamente. Abrir pedido indevido cria trabalho para a fiscalização municipal — por isso o padrão é não escalar.</div>
+      </div>
+      <div class="learning">
+        <div class="learning-title">Pré-lançamento</div>
+        <div class="learning-desc">O núcleo fiscal roda em produção, mas a API de integração ainda está sendo definida e pode mudar antes do <code>1.0</code>. Roadmap: validação local contra XSD antes do envio, núcleo em PHP puro sem Laravel e eventos de domínio.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site">
+    <div class="footer-line">Click NFS-e &middot; Open source &middot; MIT</div>
+    <a class="btn-github" href="https://github.com/NoClick11/click-nfse" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,7 3,12 8,17"></polyline><polyline points="16,7 21,12 16,17"></polyline></svg>
+      Ver no GitHub
+    </a>
+  </footer>
+</div>
+</body>
+</html>
