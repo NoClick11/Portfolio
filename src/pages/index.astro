@@ -94,6 +94,18 @@
     font-size:12.5px;font-weight:700;letter-spacing:0.04em;text-decoration:none;
   }
   .nav-cta:hover{background:rgba(0,229,255,0.08);}
+  /* once the nav scrolls away, the contact button stays pinned to the top right */
+  .nav-cta.is-floating{
+    position:fixed;z-index:50;
+    top:calc(24px + env(safe-area-inset-top,0px));
+    right:calc(clamp(20px,5vw,64px) + env(safe-area-inset-right,0px));
+    background:rgba(4,8,6,0.88);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    box-shadow:0 6px 24px rgba(0,0,0,0.45),0 0 18px rgba(0,229,255,0.12);
+    animation:cta-in 320ms ease;
+  }
+  .nav-cta.is-floating:hover{background:rgba(0,229,255,0.14);}
+  @keyframes cta-in{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion: reduce){.nav-cta.is-floating{animation:none;}}
 
   /* ---- Hero ---- */
   .hero{padding:min(9vw,72px) clamp(20px,5vw,64px) 56px;}
@@ -1180,6 +1192,12 @@
   addEventListener('resize', fit);
   new ResizeObserver(fit).observe(page);
   requestAnimationFrame(frame);
+})();
+</script>
+<script>
+(() => {
+  const nav = document.querySelector('nav.site'), cta = nav.querySelector('.nav-cta');
+  new IntersectionObserver(([e]) => cta.classList.toggle('is-floating', !e.isIntersecting)).observe(nav);
 })();
 </script>
 </body>
