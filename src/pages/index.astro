@@ -395,15 +395,16 @@
 
   <section id="ai" class="pattern-bg">
     <div class="section-title"><span class="num">02</span>Soluções com IA</div>
-    <p class="ai-lead">Soluções com inteligência artificial que já desenvolvi: atendimento automatizado, cálculos jurídicos e agentes trabalhando em conjunto.</p>
+    <p class="ai-lead">Soluções com inteligência artificial que já desenvolvi: atendimento automatizado, cálculos jurídicos, agentes trabalhando em conjunto e RAG.</p>
     <div class="ai-grid">
-      <div class="ai-orb"><canvas id="ai-orb" aria-label="Núcleo de IA com quatro soluções em órbita; a selecionada mostra suas etapas"></canvas></div>
+      <div class="ai-orb"><canvas id="ai-orb" aria-label="Núcleo de IA com cinco soluções em órbita; a selecionada mostra suas etapas"></canvas></div>
       <div>
         <div class="ai-list">
           <button type="button" aria-pressed="true"><span class="dot"></span><span class="n">Assistentes no WhatsApp</span></button>
           <button type="button" aria-pressed="false"><span class="dot"></span><span class="n">Agentes de voz em chamadas</span></button>
           <button type="button" aria-pressed="false"><span class="dot"></span><span class="n">IA para cálculos jurídicos</span></button>
           <button type="button" aria-pressed="false"><span class="dot"></span><span class="n">Orquestração de agentes</span></button>
+          <button type="button" aria-pressed="false"><span class="dot"></span><span class="n">RAG: IA com os dados da empresa</span></button>
         </div>
         <div class="ai-details">
         <div class="ai-detail on"><div class="ai-sig">atendimento por mensagem</div>
@@ -418,6 +419,9 @@
         <div class="ai-detail"><div class="ai-sig">agentes em equipe</div>
           <p>Vários agentes de IA trabalhando juntos. Um agente principal divide a tarefa, passa cada parte para um agente especializado e junta as respostas no final, conferindo o resultado antes de entregar.</p>
           <div class="ai-tags"><span>multiagentes</span><span>orquestração</span><span>automação</span></div></div>
+        <div class="ai-detail"><div class="ai-sig">respostas com base nos seus dados</div>
+          <p>IA que responde usando os documentos e dados da própria empresa. O conteúdo é organizado numa base de busca, e a cada pergunta a IA encontra os trechos mais relevantes e responde em cima deles, em vez de inventar.</p>
+          <div class="ai-tags"><span>RAG</span><span>busca semântica</span><span>base de conhecimento</span></div></div>
         </div>
       </div>
     </div>
@@ -747,17 +751,18 @@
   const cv = document.getElementById('ai-orb'), ctx = cv.getContext('2d');
   const btns = [...document.querySelectorAll('.ai-list button')], details = [...document.querySelectorAll('.ai-detail')];
   const CAPS = [
-    { name: 'WhatsApp', ang: -2.36, sats: ['mensagem', 'histórico', 'sistema', 'resposta'] },
-    { name: 'Voz', ang: -0.785, sats: ['ouvir', 'entender', 'falar'] },
-    { name: 'Cálculos', ang: 0.785, sats: ['dados', 'calculadoras', 'resultado'] },
-    { name: 'Agentes', ang: 2.36, sats: ['agente A', 'agente B', 'agente C', 'revisão'] }
+    { name: 'WhatsApp', ang: -2.199, sats: ['mensagem', 'histórico', 'sistema', 'resposta'] },
+    { name: 'Voz', ang: -0.942, sats: ['ouvir', 'entender', 'falar'] },
+    { name: 'Cálculos', ang: 0.314, sats: ['dados', 'calculadoras', 'resultado'] },
+    { name: 'Agentes', ang: 1.571, sats: ['agente A', 'agente B', 'agente C', 'revisão'] },
+    { name: 'RAG', ang: 2.827, sats: ['documentos', 'busca', 'contexto', 'resposta'] }
   ];
-  let W, S, active = 0, open = [1, 0, 0, 0], pulses = [], timer;
+  let W, S, active = 0, open = [1, 0, 0, 0, 0], pulses = [], timer;
   const dust = Array.from({ length: 46 }, () => ({ x: Math.random(), y: Math.random(), vx: (Math.random() - 0.5) * 0.00015, vy: (Math.random() - 0.5) * 0.00015 }));
 
   function fit() { const r = cv.getBoundingClientRect(), k = Math.min(devicePixelRatio || 1, 2); W = r.width; S = Math.min(r.width, r.height); cv.width = r.width * k; cv.height = r.height * k; ctx.setTransform(k, 0, 0, k, 0, 0); }
   function select(i) { if (i !== active) pulses = []; active = i; btns.forEach((b, j) => b.setAttribute('aria-pressed', String(i === j))); details.forEach((d, j) => d.classList.toggle('on', i === j)); schedule(); }
-  function schedule() { clearTimeout(timer); if (!reduced) timer = setTimeout(() => select((active + 1) % 4), 8000); }
+  function schedule() { clearTimeout(timer); if (!reduced) timer = setTimeout(() => select((active + 1) % CAPS.length), 8000); }
   btns.forEach((b, i) => b.addEventListener('click', () => select(i)));
   schedule();
 
@@ -766,7 +771,7 @@
     return CAPS.map((cap, i) => {
       const R = S * 0.25, a = cap.ang + Math.sin(t / 9000 + i) * 0.015;
       const p = { x: c.x + Math.cos(a) * R, y: c.y + Math.sin(a) * R };
-      const n = cap.sats.length, spread = 1.5;
+      const n = cap.sats.length, spread = 1.2;
       const sats = cap.sats.map((label, j) => {
         const sa = a + (j - (n - 1) / 2) * (spread / Math.max(n - 1, 1)), sr = S * (0.1 + 0.06 * open[i]);
         return { label, x: p.x + Math.cos(sa) * sr, y: p.y + Math.sin(sa) * sr };
