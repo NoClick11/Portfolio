@@ -51,15 +51,32 @@
 
   .page{position:relative;z-index:1;}
 
-  /* alternating section fill: faint circuit/grid */
-  .pattern-bg{
+  /* section fill: faint circuit/grid that fades in and out at the edges, so there is no hard seam */
+  .pattern-bg{position:relative;isolation:isolate;}
+  .pattern-bg::before{
+    content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
     background-image:
       radial-gradient(rgba(0,229,255,0.14) 1px,transparent 1.5px),
       linear-gradient(rgba(0,229,255,0.045) 1px,transparent 1px),
       linear-gradient(90deg,rgba(0,229,255,0.045) 1px,transparent 1px);
     background-size:44px 44px,44px 44px,44px 44px;
     background-position:-1px -1px;
+    -webkit-mask-image:linear-gradient(to bottom,transparent,#000 22%,#000 78%,transparent);
+    mask-image:linear-gradient(to bottom,transparent,#000 22%,#000 78%,transparent);
   }
+
+  /* one continuous tone behind the page: each section has its own faint tint, blended over long gradients */
+  .page-tone{position:absolute;inset:0;z-index:-1;pointer-events:none;}
+  /* sections fade and settle slightly as they scroll out the top */
+  .page > header.hero,.page > section{transform-origin:50% 0;will-change:opacity,transform;}
+
+  /* particles drifting from the bottom of each section into the next */
+  .page-drift{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+
+  /* sections ease in as they reach the viewport */
+  .reveal{transition:opacity 900ms cubic-bezier(.2,.7,.2,1),transform 900ms cubic-bezier(.2,.7,.2,1);}
+  .reveal.pending{opacity:0;transform:translateY(28px);}
+  @media (prefers-reduced-motion: reduce){.reveal.pending{opacity:1;transform:none;}}
 
   /* ---- Nav ---- */
   nav.site{
@@ -333,6 +350,8 @@
 <div id="cursor-glow"></div>
 
 <div class="page">
+  <div class="page-tone" aria-hidden="true"></div>
+  <canvas class="page-drift" aria-hidden="true"></canvas>
 
   <nav class="site">
     <div class="brand">Manuel Bahamonde</div>
@@ -1058,6 +1077,109 @@
   }
   let started = false;
   onVisible(term, vis => { if (vis && !started) { started = true; play(); } });
+})();
+</script>
+<script>
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // experience has its own entrance (and its trace measures the title), so it stays out of this
+  const groups = [...document.querySelectorAll('section:not(#experience)')].map(sec => [...sec.children]);
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target);
+    e.target.classList.remove('pending');
+  }), { rootMargin: '0px 0px -10% 0px' });
+  groups.forEach(items => items.forEach((el, i) => {
+    if (el.getBoundingClientRect().top < innerHeight) return;
+    el.classList.add('reveal', 'pending');
+    el.style.transitionDelay = `${Math.min(i, 3) * 110}ms`;
+    io.observe(el);
+  }));
+})();
+</script>
+<script>
+(() => {
+  const page = document.querySelector('.page'), tone = page.querySelector('.page-tone');
+  const blocks = [...page.querySelectorAll(':scope > header.hero, :scope > section')];
+  // tint per block (hero, ia, projetos, experiência, contato); low alpha so the background effects still show
+  const TINTS = ['rgba(0,0,0,0)', 'rgba(0,229,255,0.035)', 'rgba(34,255,110,0.028)', 'rgba(0,200,180,0.04)', 'rgba(34,255,110,0.055)'];
+  function paintTone() {
+    const H = page.scrollHeight, top = page.getBoundingClientRect().top;
+    const stops = blocks.map((b, i) => {
+      const r = b.getBoundingClientRect(), mid = (r.top - top + r.height / 2) / H * 100;
+      return `${TINTS[i] || TINTS[TINTS.length - 1]} ${mid.toFixed(2)}%`;
+    });
+    tone.style.background = `linear-gradient(to bottom, ${TINTS[0]} 0%, ${stops.join(', ')}, ${TINTS[blocks.length - 1] || TINTS[0]} 100%)`;
+  }
+  paintTone();
+  new ResizeObserver(paintTone).observe(page);
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // scroll-linked: as a block's bottom climbs past mid-screen it fades and shrinks a touch
+  let ticking = false;
+  function fade() {
+    ticking = false;
+    const vh = innerHeight;
+    blocks.forEach(b => {
+      const bottom = b.getBoundingClientRect().bottom;
+      const out = Math.min(1, Math.max(0, 1 - bottom / (vh * 0.55)));
+      b.style.opacity = out ? (1 - out * 0.75).toFixed(3) : '';
+      b.style.transform = out ? `scale(${(1 - out * 0.03).toFixed(4)})` : '';
+    });
+  }
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(fade); } }, { passive: true });
+  fade();
+})();
+</script>
+<script>
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const page = document.querySelector('.page'), cv = page.querySelector('.page-drift'), ctx = cv.getContext('2d');
+  const blocks = [...page.querySelectorAll(':scope > header.hero, :scope > section')];
+  const GREEN = [34, 255, 110], CYAN = [0, 229, 255];
+  const RISE = 140, FALL = 260, PER = 34;  // particles start inside the upper section and settle into the next one
+  let W = 0, H = 0, seams = [];
+  function fit() {
+    const k = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight; cv.width = W * k; cv.height = H * k; ctx.setTransform(k, 0, 0, k, 0, 0);
+    seams = blocks.slice(0, -1).map((b, i) => {
+      const y = b.getBoundingClientRect().bottom + scrollY;
+      const old = seams[i];
+      return { y, from: i % 2 ? CYAN : GREEN, to: i % 2 ? GREEN : CYAN, parts: old ? old.parts : Array.from({ length: PER }, () => spawn(true)) };
+    });
+  }
+  function spawn(scatter) {
+    return { x: Math.random(), t: scatter ? Math.random() : 0, v: 0.0012 + Math.random() * 0.0022, r: 0.6 + Math.random() * 1.4, sway: Math.random() * 6.28 };
+  }
+  const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k)).join(',');
+  function frame(now) {
+    ctx.clearRect(0, 0, W, H);
+    for (const s of seams) {
+      const sy = s.y - scrollY;
+      if (sy < -FALL - 40 || sy > H + RISE + 40) continue;  // only seams near the screen
+      const pts = [];
+      for (const p of s.parts) {
+        p.t += p.v;
+        if (p.t >= 1) Object.assign(p, spawn(false));
+        const y = sy - RISE + p.t * (RISE + FALL);
+        const x = p.x * W + Math.sin(now / 1600 + p.sway) * 10;
+        const a = Math.sin(p.t * Math.PI) * 0.55;
+        pts.push({ x, y, a, c: mix(s.from, s.to, p.t) });
+        ctx.fillStyle = `rgba(${mix(s.from, s.to, p.t)},${a})`;
+        ctx.beginPath(); ctx.arc(x, y, p.r, 0, 7); ctx.fill();
+      }
+      // faint links between close particles, echoing the network look of the AI section
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+        const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 90) { ctx.strokeStyle = `rgba(${a.c},${Math.min(a.a, b.a) * 0.25 * (1 - d / 90)})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  fit();
+  addEventListener('resize', fit);
+  new ResizeObserver(fit).observe(page);
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
